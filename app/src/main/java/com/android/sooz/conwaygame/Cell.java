@@ -20,5 +20,5 @@ public class Cell {
     public void die(){
         alive = false;
     }
-    
+
 }
