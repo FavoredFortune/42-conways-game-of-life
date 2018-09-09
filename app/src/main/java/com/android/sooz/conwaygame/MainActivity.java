@@ -9,22 +9,28 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-import static com.android.sooz.conwaygame.GridEngine.buildGrid;
 
 public class MainActivity extends AppCompatActivity
         implements ViewTreeObserver.OnGlobalLayoutListener, View.OnTouchListener{
 
-    @BindView(R.id.canvasView)
+    @BindView(R.id.imageView)
     public ImageView imageView;
     private Bitmap mBitmap;
     private Canvas mCanvas;
 
+    @BindView(R.id.valueDisplay)
+    public TextView valueDisplay;
+
+    private Cell cell;
     private GridEngine engine;
+    private boolean[][] drawGrid;
+    public int SIZE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +45,7 @@ public class MainActivity extends AppCompatActivity
         if(viewTreeObserver.isAlive()){
             viewTreeObserver.addOnGlobalLayoutListener(this);
         }
+
     }
 
     @Override
@@ -60,21 +67,46 @@ public class MainActivity extends AppCompatActivity
 
         mCanvas = new Canvas(mBitmap);
 
-        buildGrid();
+        engine.drawGrid();
     }
 
     @OnClick(R.id.tick)
     public void tick(){
-        //logic to change grid squares based on # of neighbors
-            //Any live cell with fewer than two live neighbors dies, as if by under population.
-            //Any live cell with two or three live neighbors lives on to the next generation.
-            //Any live cell with more than three live neighbors dies, as if by overpopulation.
-            //Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction.
+        engine.toggleTick(drawGrid);
+
     }
 
+    private float xDown;
+    private float yDown;
+
+    private float xUp;
+    private float yUp;
+
+    private float xMove;
+    private float yMove;
 
     @Override
-    public boolean onTouch(View v, MotionEvent event) {
+    public boolean onTouch(View view, MotionEvent motionEvent){
+        int action = motionEvent.getAction();
+        float xx = motionEvent.getX();
+        float yy = motionEvent.getY();
+
+        //use of Math.floor based on input from classmate Amy Cohen
+        String l1 ="size: " + SIZE + "x: " + ((int)Math.floor(xx)) + " y: " + ((int)Math.floor(yy));
+        String l2 = "Column X: " + ((int)Math.floor(xx/SIZE) + "\nRow Y: "+ ((int)Math.floor(yy/SIZE)));
+
+
+        valueDisplay.setText(l1+ "\n"+ l2);
+        engine.drawGrid();
+
+        if(action == MotionEvent.ACTION_DOWN) {
+            Log.d("ACTION", "down");
+            xDown = xx;
+            yDown = yy;
+
+            cell.transform();
+            return true;
+        }
         return false;
     }
 }
