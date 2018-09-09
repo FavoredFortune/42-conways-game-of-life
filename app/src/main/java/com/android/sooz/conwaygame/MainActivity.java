@@ -16,7 +16,6 @@ import android.widget.TextView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 
 public class MainActivity extends AppCompatActivity
@@ -30,20 +29,16 @@ public class MainActivity extends AppCompatActivity
     @BindView(R.id.valueDisplay)
     public TextView valueDisplay;
 
+    @BindView(R.id.tickCount)
+    public TextView tickCount;
+
     private Button mTick;
-
-    protected Cell cell;
-    protected GridEngine engine;
-    protected boolean[][] drawGrid;
-    public int SIZE;
-    public static final int cellSize = 20;
-
-    boolean[][] cells;
-
-    public static Cell[][] gameGrid;
-
     private int tickClicks;
 
+    protected GridEngine engine;
+    public int SIZE;
+    public static final int cellSize = 20;
+    boolean[][] cells;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,12 +63,16 @@ public class MainActivity extends AppCompatActivity
             viewTreeObserver.addOnGlobalLayoutListener(this);
         }
 
+        //enables users to track how many times they've ticked
+        //and changed the "population" of the game until it becomes stable
         mTick = findViewById(R.id.tick);
-        valueDisplay = findViewById(R.id.valueDisplay);
+        tickCount = findViewById(R.id.tickCount);
 
         mTick.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //moved from my tick method to here so I could properly increment
+                //the tick view on screen and change the grids at the same time.
                 for (int row = 0; row < cells.length; row++) {
                     for (int col = 0; col < cells[row].length; col++) {
                         int neighbors = engine.checkNeighborNumbers(cells, row, col);
@@ -88,10 +87,12 @@ public class MainActivity extends AppCompatActivity
                         }
                     }
                 }
-
+                //redraw grid based on new values
                 drawGrid();
+                //increment number of ticks
                 tickClicks++;
-                valueDisplay.setText("Ticks so far " + tickClicks);
+                //update count of ticks for player/user
+                tickCount.setText(tickClicks + " ticks so far" );
             }
         });
 
@@ -164,60 +165,45 @@ public class MainActivity extends AppCompatActivity
 
         imageView.setImageBitmap(mBitmap);
     }
-
-    @OnClick(R.id.tick)
-    public void tick(){
-        int tickCount = 0;
-        tickCount ++;
-        for (int row = 0; row < cells.length; row++) {
-            for (int col = 0; col < cells[row].length; col++) {
-                int neighbors = engine.checkNeighborNumbers(cells, row, col);
-                if (neighbors < 2) {
-                    cells[row][col] = false;
-                } else if (neighbors == 2 || neighbors == 3) {
-                    cells[row][col] = true;
-                } else if (neighbors > 3) {
-                    cells[row][col] = false;
-                } else if (neighbors == 3) {
-                    cells[row][col] = true;
-                }
-            }
-        }
-
-        drawGrid();
-    }
-
-
-
-
-    private float xDown;
-    private float yDown;
-
+    private int xDown;
+    private int yDown;
 
     @Override
-    public boolean onTouch(View view, MotionEvent motionEvent){
+    public boolean onTouch(View view, MotionEvent motionEvent) {
         int action = motionEvent.getAction();
         float xx = motionEvent.getX();
         float yy = motionEvent.getY();
 
         //use of Math.floor based on input from classmate Amy Cohen
-        String l1 ="size: " + SIZE + "x: " + ((int)Math.floor(xx)) + " y: " + ((int)Math.floor(yy));
-        String l2 = "Column X: " + ((int)Math.floor(xx/SIZE) + "\nRow Y: "+ ((int)Math.floor(yy/SIZE)));
+        String msg = "Column X: " + ((int) Math.floor(xx / SIZE) + "\nRow Y: " + ((int) Math.floor(yy / SIZE)));
 
 
-        valueDisplay.setText(l1+ "\n"+ l2);
+        valueDisplay.setText(msg);
         drawGrid();
 
-        if(action == MotionEvent.ACTION_DOWN) {
+        if (action == MotionEvent.ACTION_DOWN) {
             Log.d("ACTION", "down");
-            xDown = xx;
-            yDown = yy;
 
-//            if(cell.alive){
-//                cell.color = Color.BLACK;
-//            } else {
-//                cell.die();
+            xDown = (int) xx/cellSize;
+            yDown = (int) yy/cellSize;
+
+
+            //code to let user change cell status
+            //before or after tick
+            //NOT CURRENTLY WORKING - 9 Sept 2018
+            //planing on coming back to this
+
+            //option 1?
+//            Cell touchCell = null;
+//            touchCell.alive= cells[xDown][yDown];
+////            if (engine.getCellValue(cells, xDown, yDown)){
+//                touchCell.transform();
+////            }
+            //option2?
+//            if(cells[xDown][yDown]){
+//                cells[xDown][yDown] = false;
 //            }
+//
             return true;
         }
         return false;

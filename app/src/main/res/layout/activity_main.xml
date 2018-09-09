@@ -17,11 +17,21 @@
 
     <TextView
         android:id="@+id/valueDisplay"
-        android:textSize="30sp"
+        android:textSize="15sp"
+        android:textAlignment="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/tickCount"/>
+
+    <TextView
+        android:id="@+id/tickCount"
+        android:textSize="25sp"
+        android:textStyle="bold"
         android:textAlignment="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@+id/tick"/>
+
 
     <Button
         android:id="@+id/tick"
