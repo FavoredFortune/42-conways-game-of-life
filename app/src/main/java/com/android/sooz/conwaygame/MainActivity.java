@@ -2,6 +2,8 @@ package com.android.sooz.conwaygame;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,16 +23,20 @@ public class MainActivity extends AppCompatActivity
 
     @BindView(R.id.imageView)
     public ImageView imageView;
-    private Bitmap mBitmap;
-    private Canvas mCanvas;
+    public Bitmap mBitmap;
+    public Canvas mCanvas;
 
     @BindView(R.id.valueDisplay)
     public TextView valueDisplay;
 
-    private Cell cell;
-    private GridEngine engine;
-    private boolean[][] drawGrid;
+    protected Cell cell;
+    protected GridEngine engine;
+    protected boolean[][] drawGrid;
     public int SIZE;
+
+    boolean[][] cells;
+
+    public static Cell[][] gameGrid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +57,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onGlobalLayout() {
         initBitmap();
+        drawGrid();
 
     }
 
@@ -58,16 +65,14 @@ public class MainActivity extends AppCompatActivity
 
         imageView.setOnTouchListener(this);
 
-
         int width = imageView.getWidth();
         int height = imageView.getHeight();
 
-        Log.d("DIMENSIONS", ""+ width + " x " + height + " y");
+        Log.d("DIMENSIONS", "width "+ width + " x  height" + height + " y");
         mBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 
         mCanvas = new Canvas(mBitmap);
 
-        engine.drawGrid();
     }
 
     @OnClick(R.id.tick)
@@ -97,7 +102,7 @@ public class MainActivity extends AppCompatActivity
 
 
         valueDisplay.setText(l1+ "\n"+ l2);
-        engine.drawGrid();
+        drawGrid();
 
         if(action == MotionEvent.ACTION_DOWN) {
             Log.d("ACTION", "down");
@@ -109,4 +114,50 @@ public class MainActivity extends AppCompatActivity
         }
         return false;
     }
+
+    public boolean[][] drawGrid(){
+
+        int height = mCanvas.getHeight();
+        int width = mCanvas.getWidth();
+
+
+        int SIZE = 20;
+
+        float x0 = 0;
+        float y0 = 0;
+
+        float x1= SIZE;
+        float y1 = SIZE;
+        for(int row = 0; row <height/SIZE; row++){
+            x0 = 0;
+            x1 = SIZE;
+            for(int col = 0; col<width/SIZE; col++){
+
+                int color;
+
+                if(cells[row][col] == true){
+                    color = Color.WHITE;
+                } else{
+                    color = Color.BLACK;
+                }
+
+                Paint brush = new Paint(Paint.ANTI_ALIAS_FLAG);
+                brush.setColor(color);
+
+                mCanvas.drawRect(x0,y0,x1,y1,brush);
+
+                //update to the next column
+                x0 += SIZE;
+                x1 += SIZE;
+
+            }
+            //update the row
+            y0 += SIZE;
+            y1 += SIZE;
+        }
+
+        imageView.setImageBitmap(mBitmap);
+        return drawGrid;
+    }
+
 }

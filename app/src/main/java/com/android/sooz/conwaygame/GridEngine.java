@@ -10,63 +10,20 @@ import android.widget.ImageView;
 import butterknife.BindView;
 
 public class GridEngine {
-    protected static Bitmap mBitmap;
-    protected static Canvas mCanvas;
-    public Cell cell;
-
     @BindView(R.id.imageView)
     public ImageView imageView;
+    public Bitmap mBitmap;
+    public Canvas mCanvas;
+
+    public GridEngine(){}
+
+    public Cell cell;
 
 
     boolean[][] cells;
 
     public static Cell[][] gameGrid;
 
-    public boolean[][] drawGrid(){
-
-        int height = imageView.getHeight();
-        int width = imageView.getWidth();
-
-        int smallest = (Math.min(width,height));
-
-        int SIZE = smallest/cells.length;
-
-        float x0 = 0;
-        float y0 = 0;
-
-        float x1= SIZE;
-        float y1 = SIZE;
-        for(int row = 0; row <cells.length; row++){
-            x0 = 0;
-            x1 = SIZE;
-            for(int col = 0; col<cells[row].length; col++){
-
-                int color;
-
-                if(cells[row][col] == true){
-                    color = Color.WHITE;
-                } else{
-                    color = Color.BLACK;
-                }
-
-                Paint brush = new Paint(Paint.ANTI_ALIAS_FLAG);
-                brush.setColor(color);
-
-                mCanvas.drawRect(x0,y0,x1,y1,brush);
-
-                //update to the next column
-                x0 += SIZE;
-                x1 += SIZE;
-
-            }
-            //update the row
-            y0 += SIZE;
-            y1 += SIZE;
-        }
-
-        imageView.setImageBitmap(mBitmap);
-        return drawGrid();
-    }
 
     public void clear(){
 
