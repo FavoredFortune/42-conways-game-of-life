@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -29,14 +30,19 @@ public class MainActivity extends AppCompatActivity
     @BindView(R.id.valueDisplay)
     public TextView valueDisplay;
 
+    private Button mTick;
+
     protected Cell cell;
     protected GridEngine engine;
     protected boolean[][] drawGrid;
     public int SIZE;
+    public static final int cellSize = 20;
 
     boolean[][] cells;
 
     public static Cell[][] gameGrid;
+
+    private int tickClicks;
 
 
     @Override
@@ -50,7 +56,6 @@ public class MainActivity extends AppCompatActivity
 
         //from lecture review and Amy Cohen's version
         //initializes grid of cells for canvas to draw on
-        int cellSize = 20;
         cells = new boolean[cellSize][cellSize];
         for (int row = 0; row < cellSize; row ++) {
             for (int col = 0; col < cellSize; col++) {
@@ -62,6 +67,33 @@ public class MainActivity extends AppCompatActivity
         if(viewTreeObserver.isAlive()){
             viewTreeObserver.addOnGlobalLayoutListener(this);
         }
+
+        mTick = findViewById(R.id.tick);
+        valueDisplay = findViewById(R.id.valueDisplay);
+
+        mTick.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                for (int row = 0; row < cells.length; row++) {
+                    for (int col = 0; col < cells[row].length; col++) {
+                        int neighbors = engine.checkNeighborNumbers(cells, row, col);
+                        if (neighbors < 2) {
+                            cells[row][col] = false;
+                        } else if (neighbors == 2 || neighbors == 3) {
+                            cells[row][col] = true;
+                        } else if (neighbors > 3) {
+                            cells[row][col] = false;
+                        } else if (neighbors == 3) {
+                            cells[row][col] = true;
+                        }
+                    }
+                }
+
+                drawGrid();
+                tickClicks++;
+                valueDisplay.setText("Ticks so far " + tickClicks);
+            }
+        });
 
     }
 
@@ -135,6 +167,8 @@ public class MainActivity extends AppCompatActivity
 
     @OnClick(R.id.tick)
     public void tick(){
+        int tickCount = 0;
+        tickCount ++;
         for (int row = 0; row < cells.length; row++) {
             for (int col = 0; col < cells[row].length; col++) {
                 int neighbors = engine.checkNeighborNumbers(cells, row, col);
@@ -150,7 +184,10 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
+        drawGrid();
     }
+
+
 
 
     private float xDown;
