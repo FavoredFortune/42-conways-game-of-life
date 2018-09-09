@@ -10,7 +10,10 @@ As a user I want to be able to click on a blank white canvas as many times as I 
 Then I want to be able to hit a "tick" button that simulates a journey of each black cell towards a stable population. 
 
 ###Stretch Goal
-As a user I would also like to know, each time I play the game, how many squares I turn black and how many times I have to "tick" to get a stable population.
+As a user, each time I play the game, I would also like to know:
+ - [ ] How many squares I turn black 
+ 
+ - [x] How many times I have to "tick" to get a stable population._Achieved_
 
 #Technology
 
@@ -30,5 +33,10 @@ As a user I would also like to know, each time I play the game, how many squares
 #Credits
 
 - Class lecture
-- Dzone
-- Classmates Timothy GB Busch, Amy Cohen and Tyler Pearson
+- Dzone (see link above)
+- Classmates Timothy GB Busch, Amy Cohen 
+
+#Screenshots
+[Start of game - pre -tick](screenshots/showconwaygameboard_start.png)
+[Display of tick count, show of grid/game change](screenshots/showtickcount_intial.png)
+[Display of onTouch location with row/column address](screenshots/ticks_showtouchgridlocation.png)
