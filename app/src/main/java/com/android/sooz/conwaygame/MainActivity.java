@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity
 
     public static Cell[][] gameGrid;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +47,16 @@ public class MainActivity extends AppCompatActivity
         ButterKnife.bind(this);
 
         engine = new GridEngine();
+
+        //from lecture review and Amy Cohen's version
+        //initializes grid of cells for canvas to draw on
+        int cellSize = 20;
+        cells = new boolean[cellSize][cellSize];
+        for (int row = 0; row < cellSize; row ++) {
+            for (int col = 0; col < cellSize; col++) {
+                cells[row][col] = Math.random() < .5;
+            }
+        }
 
         ViewTreeObserver viewTreeObserver = imageView.getViewTreeObserver();
         if(viewTreeObserver.isAlive()){
@@ -57,7 +68,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onGlobalLayout() {
         initBitmap();
-        drawGrid();
 
     }
 
@@ -73,22 +83,79 @@ public class MainActivity extends AppCompatActivity
 
         mCanvas = new Canvas(mBitmap);
 
+        drawGrid();
+
+    }
+
+    //from class lecture
+    public void drawGrid(){
+
+        int height = mCanvas.getHeight();
+        int width = mCanvas.getWidth();
+        int smallest = Math.min(width, height);
+        SIZE = smallest/cells.length;
+
+        float x0 = 0;
+        float y0 = 0;
+
+        float x1= SIZE;
+        float y1 = SIZE;
+        for(int row = 0; row < cells.length; row++){
+            x0 = 0;
+            x1 = SIZE;
+            for(int col = 0; col < cells.length; col++){
+
+                int color;
+
+                //to create a Conway world you just tick through
+                //until stable population exists
+                if(cells[row][col] == true){
+                    color = Color.BLACK;
+                } else{
+                    color = Color.WHITE;
+                }
+
+                Paint brush = new Paint(Paint.ANTI_ALIAS_FLAG);
+                brush.setColor(color);
+
+                mCanvas.drawRect(x0,y0,x1,y1,brush);
+
+                //update to the next column
+                x0 += SIZE;
+                x1 += SIZE;
+
+            }
+            //update the row
+            y0 += SIZE;
+            y1 += SIZE;
+        }
+
+        imageView.setImageBitmap(mBitmap);
     }
 
     @OnClick(R.id.tick)
     public void tick(){
-        engine.toggleTick(drawGrid);
+        for (int row = 0; row < cells.length; row++) {
+            for (int col = 0; col < cells[row].length; col++) {
+                int neighbors = engine.checkNeighborNumbers(cells, row, col);
+                if (neighbors < 2) {
+                    cells[row][col] = false;
+                } else if (neighbors == 2 || neighbors == 3) {
+                    cells[row][col] = true;
+                } else if (neighbors > 3) {
+                    cells[row][col] = false;
+                } else if (neighbors == 3) {
+                    cells[row][col] = true;
+                }
+            }
+        }
 
     }
+
 
     private float xDown;
     private float yDown;
 
-    private float xUp;
-    private float yUp;
-
-    private float xMove;
-    private float yMove;
 
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent){
@@ -109,55 +176,15 @@ public class MainActivity extends AppCompatActivity
             xDown = xx;
             yDown = yy;
 
-            cell.transform();
+//            if(cell.alive){
+//                cell.color = Color.BLACK;
+//            } else {
+//                cell.die();
+//            }
             return true;
         }
         return false;
     }
 
-    public boolean[][] drawGrid(){
-
-        int height = mCanvas.getHeight();
-        int width = mCanvas.getWidth();
-
-
-        int SIZE = 20;
-
-        float x0 = 0;
-        float y0 = 0;
-
-        float x1= SIZE;
-        float y1 = SIZE;
-        for(int row = 0; row <height/SIZE; row++){
-            x0 = 0;
-            x1 = SIZE;
-            for(int col = 0; col<width/SIZE; col++){
-
-                int color;
-
-                if(cells[row][col] == true){
-                    color = Color.WHITE;
-                } else{
-                    color = Color.BLACK;
-                }
-
-                Paint brush = new Paint(Paint.ANTI_ALIAS_FLAG);
-                brush.setColor(color);
-
-                mCanvas.drawRect(x0,y0,x1,y1,brush);
-
-                //update to the next column
-                x0 += SIZE;
-                x1 += SIZE;
-
-            }
-            //update the row
-            y0 += SIZE;
-            y1 += SIZE;
-        }
-
-        imageView.setImageBitmap(mBitmap);
-        return drawGrid;
-    }
 
 }
